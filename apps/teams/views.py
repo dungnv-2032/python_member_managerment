@@ -39,8 +39,10 @@ class AddTeamView(View):
 
     @method_decorator(admin_required)
     def get(self, request):
-        users_in_team = Team.objects.select_related('team_user').values_list('user__team_user__user', flat=True)
-        users = User.objects.exclude(id__in=users_in_team)
+        users = User.objects.raw(
+            'SELECT * FROM user where user.id not in '
+            '(SELECT user_team.user_id as id from user_team group  by user_id)'
+        )
         context = {
             'users': users
         }
@@ -51,15 +53,23 @@ class AddTeamView(View):
         add_team_form = self.form_class(request.POST)
         if add_team_form.is_valid():
 
-            Team.objects.create(
+            team = Team.objects.create(
                 name=request.POST['name'],
                 description=request.POST['description'],
-                leader=request.POST['leader']
+                leader_id=request.POST['leader_id']
             )
 
+            if request.POST['member']:
+                for member in request.POST.getlist('member'):
+                    team.team_user.add(member)
+
             return redirect('admin:teams:team-list')
-        users_in_team = Team.objects.select_related('team_user').values_list('user__team_user__user', flat=True)
-        users = User.objects.exclude(id__in=users_in_team)
+
+        users = User.objects.raw(
+            'SELECT * FROM user where user.id not in '
+            '(SELECT user_team.user_id as id from user_team group  by user_id)'
+        )
+
         context = {
             'form': add_team_form,
             'users': users,
@@ -76,8 +86,20 @@ class EditTeamView(View):
         team_id = kwargs.get('id')
         team = get_object_or_404(Team, pk=team_id)
 
+        users = User.objects.raw(
+            'SELECT * FROM user where user.id not in '
+            '(SELECT user_team.user_id as id from user_team group  by user_id)'
+        )
+        members = User.objects.raw(
+            'SELECT * FROM user where user.id in '
+            '(SELECT user_team.user_id as id from user_team group by user_id)'
+        )
+        leader = User.objects.filter(id=team.leader_id).get()
         context = {
             'team': team,
+            'users': users,
+            'members': members,
+            'leader': leader,
         }
         return render(request, self.template_name, context)
 
@@ -89,9 +111,28 @@ class EditTeamView(View):
         form = self.form_class(request.POST, instance=team)
         if form.is_valid():
             form.save()
+            if request.POST.getlist('member'):
+                team.team_user.clear()
+                for member in request.POST.getlist('member'):
+                    user = User.objects.get(id=member)
+                    team.team_user.add(user)
+            else:
+                team.team_user.clear()
             messages.success(request, 'Update Team Success !')
         else:
-            return render(request, self.template_name, {'form': form})
+            users = User.objects.raw(
+                'SELECT * FROM user where user.id not in '
+                '(SELECT user_team.user_id as id from user_team group  by user_id)'
+            )
+
+            leader = User.objects.filter(id=team.leader_id).get()
+            context = {
+                'team': team,
+                'users': users,
+                'form': form,
+                'leader': leader,
+            }
+            return render(request, self.template_name, context)
 
         return redirect(reverse('admin:teams:team-edit', kwargs={'id': team_id}))
 
@@ -103,6 +144,7 @@ class DeleteTeamView(View):
     def post(self, request, *args, **kwargs):
         team_id = request.POST['id']
         team = get_object_or_404(Team, pk=team_id)
+        team.team_user.clear()
         team.delete()
         response = {
             'code': 'success',

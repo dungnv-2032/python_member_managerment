@@ -9,13 +9,13 @@
 		<div class="container-fluid">
 			<div class="row mb-2">
 				<div class="col-sm-6">
-					<h1>Edit Skill</h1>
+					<h1>Edit Team</h1>
 				</div>
 				<div class="col-sm-6">
 					<ol class="breadcrumb float-sm-right">
 						<li class="breadcrumb-item"><a href="{% url 'admin:dashboards' %}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{% url 'admin:skills:skill-list' %}">Skills</a></li>
-						<li class="breadcrumb-item active">Edit Skill</li>
+                        <li class="breadcrumb-item"><a href="{% url 'admin:teams:team-list' %}">Skills</a></li>
+						<li class="breadcrumb-item active">Edit Team</li>
 					</ol>
 				</div>
 			</div>
@@ -24,33 +24,47 @@
 	</section>
 	<!-- Main content -->
 	<section class="content">
-        <form method="post" action="{% url 'admin:skills:skill-edit' id=skill.pk %}">
-            <input type="hidden" value="{{ skill.pk }}" name="id" />
+        <form method="post" action="{% url 'admin:teams:team-edit' id=team.pk %}">
+            <input type="hidden" value="{{ team.pk }}" name="id" />
             {% csrf_token %}
             <div class="row">
                 <div class="col-md-12 col-lg-offset-3">
                     <div class="card card-primary">
-                        <div class="card-header">
-                            <h3 class="card-title">{{ skill.name }}</h3>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
-                                <i class="fas fa-minus"></i></button>
-                            </div>
-					    </div>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-12">
                                     <div class="form-group">
                                         <label for="inputName">Name</label>
-                                        <input type="text" name="name" id="inputName" class="form-control" value="{{ skill.name }}">
+                                        <input type="text" name="name" id="inputName" class="form-control" value="{{ team.name }}">
                                     </div>
                                     <div class="form-group">
-                                        <label for="inputName">Level</label>
-                                        <input type="text" name="level" id="inputLevel" class="form-control" value="{{ skill.level }}">
+                                        <label for="inputDescription">Description</label>
+                                        <textarea name="description" rows="3" id="inputLevel" class="form-control" placeholder="Input Description">
+                                            {{ team.description }}
+                                        </textarea>
                                     </div>
                                     <div class="form-group">
-                                        <label for="inputName">Used Year Number</label>
-                                        <input type="number" minlength="1" maxlength="50" name="used_year_number" id="inputLevel" class="form-control" value="{{ skill.used_year_number }}">
+                                        <label for="inputLeader">Leader</label>
+                                        <select data-placeholder="Select one leader" name="leader_id" class="form-control custom-select">
+                                            <option selected value="{{ leader.id }}">{{ leader.username }}</option>
+                                            {% for user in users %}
+                                                {% if user.id != leader.id %}
+                                                    <option value="{{ user.pk }}" >{{ user.username }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Member</label>
+                                        <select name="member" class="select2" multiple="multiple" data-placeholder="Select multi member" style="width: 100%;">
+                                            {% for member in members %}
+                                                <option value="{{ member.pk }}" selected>{{ member.username }}</option>
+                                            {% endfor %}
+                                            {% for user in users %}
+                                                <option value="{{ user.pk }}" >{{ user.username }}</option>
+                                            {% endfor %}
+
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -66,7 +80,7 @@
 
             <div class="row">
                 <div class="col-12">
-                    <a href="{% url 'admin:skills:skill-list' %}" class="btn btn-secondary">Cancel</a>
+                    <a href="{% url 'admin:teams:team-list' %}" class="btn btn-secondary">Cancel</a>
                     <input type="submit" value="Update" class="btn btn-success float-right">
                 </div>
             </div>

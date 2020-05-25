@@ -38,16 +38,24 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="inputDescription">Description</label>
-                                    <textarea type="text" name="description" id="inputLevel" class="form-control" placeholder="Input Description">
+                                    <textarea name="description" rows="3" id="inputLevel" class="form-control" placeholder="Input Description">
                                         {{ form.description.value }}
                                     </textarea>
                                 </div>
                                 <div class="form-group">
                                     <label for="inputLeader">Leader</label>
-                                    <select name="leader" class="form-control custom-select">
-                                        <option disabled="">Select one leader</option>
+                                    <select data-placeholder="Select one leader" name="leader_id" class="form-control custom-select">
+                                        <option selected disabled>Select one leader</option>
                                         {% for user in users %}
-                                            <option value="{{ user.pk }}" {% if form.leader.value == user.id %} selected {% endif %}>{{ user.username }}</option>
+                                            <option value="{{ user.pk }}" {% if form.leader_id.value == user.id %} selected {% endif %}>{{ user.username }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Member</label>
+                                    <select name="member" class="select2" multiple="multiple" data-placeholder="Select multi member" style="width: 100%;">
+                                         {% for user in users %}
+                                            <option value="{{ user.pk }}" {% if form.leader_id.value == user.id %} selected {% endif %}>{{ user.username }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>

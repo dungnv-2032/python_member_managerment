@@ -61,8 +61,8 @@
                                 {{ team.name }}
 							</td>
 							<td>
-                                {% for user in team.user.all %}
-                                    user.username + ','
+                                {% for user in team.team_user.all %}
+                                    {{ user.username }},
                                 {% endfor %}
 							</td>
 

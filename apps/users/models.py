@@ -16,6 +16,8 @@ class User(AbstractUser):
     avatar = models.ImageField(null=True, verbose_name='avatar', upload_to='images/')
     birthday = models.DateTimeField(null=True)
     position = models.ForeignKey('positions.Position', on_delete=models.CASCADE, blank=True, null=True)
+    team = models.ManyToManyField('teams.Team', blank=True, related_name='team_user')
+
     USERNAME_FIELD = 'username'
 
     class Meta:

@@ -1,0 +1,51 @@
+{% extends 'base_admin.html' %}
+{% block body_class %}  login-page {% endblock %}
+{% block nav_bar %} {% endblock %}
+{% block main_sidebar %}
+{% endblock %}
+{% block content %}
+<div class="login-box">
+   <div class="login-logo">
+      <a href="{% url 'admin:admin-login' %}"><b>Admin Member Management </b></a>
+   </div>
+   <!-- /.login-logo -->
+   <div class="card">
+      <div class="card-body login-card-body">
+         <p class="login-box-msg">Sign in to start your session</p>
+         <form action="{% url 'admin:admin-login' %}" method="post">
+             {% csrf_token %}
+            <div class="input-group mb-3">
+               <input type="text" name="username" value="{{ username }}" class="form-control" placeholder="Username">
+               <div class="input-group-append">
+                  <div class="input-group-text">
+                     <span class="fas fa-envelope"></span>
+                  </div>
+               </div>
+            </div>
+            <div class="input-group mb-3">
+               <input type="password" name="password" class="form-control" placeholder="Password">
+               <div class="input-group-append">
+                  <div class="input-group-text">
+                     <span class="fas fa-lock"></span>
+                  </div>
+               </div>
+            </div>
+            <div class="row">
+               <!-- /.col -->
+               <div class="col-4">
+                  <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+               </div>
+               <!-- /.col -->
+            </div>
+         </form>
+      </div>
+               {% include 'show_message_errors.html' %}
+
+      <!-- /.login-card-body -->
+   </div>
+</div>
+{% endblock %}
+{% block script %}
+{% endblock %}
+{% block footer %}
+{% endblock %}
